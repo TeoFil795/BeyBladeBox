@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Terminal } from './components/Terminal';
 import { ChatMessage, AppState, BeyCombo } from './types';
-import { searchCombos, parseBeyCSV, MOCK_DB } from './data/beyData';
+import { searchCombos, parseBeyCSV, INITIAL_DB } from './data/beyData';
 import { askGemini } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -9,8 +9,8 @@ const App: React.FC = () => {
   const [input, setInput] = useState('');
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
   
-  // State for the RAG dataset (starts with Mock, can be replaced by CSV)
-  const [db, setDb] = useState<BeyCombo[]>(MOCK_DB);
+  // Initialize state with the EMBEDDED CSV DATA from beyData.ts
+  const [db, setDb] = useState<BeyCombo[]>(INITIAL_DB);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +29,7 @@ const App: React.FC = () => {
            setMessages(prev => [...prev, {
              id: Date.now().toString(),
              role: 'system',
-             content: `**SYSTEM UPDATE:** Database connection established. \n\nLoaded Source: \`${file.name}\`\nRecords: ${newCombos.length}\n\nRAG protocols updated.`,
+             content: `**SYSTEM UPDATE:** Database overridden manually. \n\nSource: \`${file.name}\`\nRecords: ${newCombos.length}\n\nRAG protocols updated.`,
              timestamp: Date.now()
            }]);
         } else {
@@ -135,9 +135,9 @@ const App: React.FC = () => {
                 <button 
                   onClick={() => fileInputRef.current?.click()}
                   className="flex items-center gap-2 text-[10px] font-mono bg-green-900/20 hover:bg-green-900/40 text-green-400 border border-green-800/50 px-2 py-1 rounded transition-colors cursor-pointer"
-                  title="Upload CSV Database"
+                  title="Override with new CSV"
                 >
-                   <span className="font-bold">[^] UPLOAD_DB</span>
+                   <span className="font-bold">[^] UPLOAD_CSV</span>
                 </button>
                 <input 
                     type="file" 
@@ -165,7 +165,7 @@ const App: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 disabled={appState !== AppState.IDLE}
-                placeholder={db === MOCK_DB ? "Enter combo query (System using DEFAULT DATA)..." : "Enter combo query (System using UPLOADED DATA)..."}
+                placeholder="Enter combo query..."
                 className="w-full bg-slate-950 border border-slate-700 text-green-100 font-mono text-sm rounded p-4 pl-10 focus:outline-none focus:border-green-500/50 focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] disabled:opacity-50 transition-all"
              />
              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-green-500 font-bold">{'>'}</div>
@@ -179,8 +179,8 @@ const App: React.FC = () => {
           </form>
           <div className="mt-2 flex justify-between text-[10px] text-gray-600 font-mono uppercase">
              <span>Engine: GEMINI-2.5-FLASH</span>
-             <span className={db === MOCK_DB ? "text-gray-600" : "text-green-400"}>
-                Source: {db === MOCK_DB ? 'MOCK_DATA_V1' : 'USER_FILE_CSV'}
+             <span className={db === INITIAL_DB ? "text-green-500" : "text-blue-400"}>
+                Source: {db === INITIAL_DB ? 'EMBEDDED_CORE_DB' : 'MANUAL_OVERRIDE'}
              </span>
           </div>
         </div>

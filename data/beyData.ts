@@ -1,32 +1,47 @@
 import { BeyCombo } from '../types';
 
+// --- 1. HARDCODED CSV DATA (THE "BAKED IN" DB) ---
+// INCOLLA QUI SOTTO IL CONTENUTO DEL TUO FILE 'beyblade_data.csv' COMPLETO.
+// Mantenere l'intestazione è fondamentale.
+const EMBEDDED_CSV_DATA = `Combo ID,Combo Rank,Points,Blade,Ratchet,Bit,Sample Size (Win Count)
+WIZ-001,1,4500,Wizard Rod,9-60,Ball,1240
+PHO-002,2,4200,Phoenix Wing,5-60,Point,1150
+WIZ-003,3,3800,Wizard Rod,5-70,Hexa,980
+HEL-004,4,3600,Hells Scythe,3-60,Ball,890
+SHA-005,5,3400,Shark Edge,3-60,Low Flat,850
+PHO-006,6,3300,Phoenix Wing,3-60,Rush,820
+DRA-007,7,3100,Dran Sword,3-60,Flat,780
+COB-008,8,2900,Cobalt Drake,4-60,Flat,750
+UNI-009,9,2800,Unicorn Sting,5-60,Gear Point,710
+VIP-010,10,2600,Viper Tail,5-80,Orb,680
+WIZ-011,11,2500,Wizard Arrow,4-80,Ball,650
+KNI-012,12,2400,Knight Shield,3-80,Needle,620
+HEL-013,13,2300,Hells Chain,5-60,High Taper,600
+DKE-014,14,2200,Dran Dagger,3-60,Rush,580
+RHI-015,15,2100,Rhino Horn,3-80,Spike,550
+WIZ-016,16,2050,Wizard Rod,5-60,Ball,540
+PHO-017,17,2000,Phoenix Wing,9-60,Point,530
+SHA-018,18,1950,Shark Edge,4-60,Low Flat,520
+HEL-019,19,1900,Hells Scythe,5-60,Taper,510
+DRA-020,20,1850,Dran Buster,1-60,Low Flat,500
+WIZ-021,21,1800,Wizard Rod,9-60,Orb,490
+UNI-022,22,1750,Unicorn Sting,3-60,Point,480
+COB-023,23,1700,Cobalt Drake,9-60,Flat,470
+VIP-024,24,1650,Viper Tail,4-60,Ball,460
+KNI-025,25,1600,Knight Shield,5-60,Hexa,450
+HEL-026,26,1550,Hells Chain,9-60,Taper,440
+DKE-027,27,1500,Dran Dagger,5-60,Rush,430
+RHI-028,28,1450,Rhino Horn,5-80,Needle,420
+WIZ-029,29,1400,Wizard Arrow,3-60,Orb,410
+PHO-030,30,1350,Phoenix Wing,5-60,Rush,400`;
+
+/**
+ * Creates the RAG string exactly matching your Python script:
+ * f"Combo ID: {row['Combo ID']}. Rank: {row['Combo Rank']} (Punti: {row['Points']}). Componenti -> Blade: {row['Blade']}, Ratchet: {row['Ratchet']}, Bit: {row['Bit']}. Vittorie nel campione: {row['Sample Size (Win Count)']}. "
+ */
 const createRagContent = (c: Partial<BeyCombo>) => {
   return `Combo ID: ${c.id}. Rank: ${c.rank} (Punti: ${c.points}). Componenti -> Blade: ${c.blade}, Ratchet: ${c.ratchet}, Bit: ${c.bit}. Vittorie nel campione: ${c.wins}.`;
 };
-
-// Initial Mock Data populated with RAG content
-const RAW_MOCK_DB: Partial<BeyCombo>[] = [
-  { id: "WIZ-001", rank: 1, points: 4500, blade: "Wizard Rod", ratchet: "9-60", bit: "Ball", wins: 1240, description: "Stamina king." },
-  { id: "PHO-002", rank: 2, points: 4200, blade: "Phoenix Wing", ratchet: "5-60", bit: "Point", wins: 1150, description: "Heavy attack." },
-  { id: "WIZ-003", rank: 3, points: 3800, blade: "Wizard Rod", ratchet: "5-70", bit: "Hexa", wins: 980, description: "Tanky stamina." },
-  { id: "HEL-004", rank: 4, points: 3600, blade: "Hells Scythe", ratchet: "3-60", bit: "Ball", wins: 890, description: "Balance standard." },
-  { id: "SHA-005", rank: 5, points: 3400, blade: "Shark Edge", ratchet: "3-60", bit: "Low Flat", wins: 850, description: "Upper attack." },
-  { id: "PHO-006", rank: 6, points: 3300, blade: "Phoenix Wing", ratchet: "3-60", bit: "Rush", wins: 820, description: "Aggressive." },
-  { id: "DRA-007", rank: 7, points: 3100, blade: "Dran Sword", ratchet: "3-60", bit: "Flat", wins: 780, description: "Classic attack." },
-  { id: "COB-008", rank: 8, points: 2900, blade: "Cobalt Drake", ratchet: "4-60", bit: "Flat", wins: 750, description: "Heavy chrome." },
-  { id: "UNI-009", rank: 9, points: 2800, blade: "Unicorn Sting", ratchet: "5-60", bit: "Gear Point", wins: 710, description: "Unpredictable." },
-  { id: "VIP-010", rank: 10, points: 2600, blade: "Viper Tail", ratchet: "5-80", bit: "Orb", wins: 680, description: "Smash stamina." },
-  { id: "WIZ-011", rank: 11, points: 2500, blade: "Wizard Arrow", ratchet: "4-80", bit: "Ball", wins: 650, description: "Beginner stamina." },
-  { id: "KNI-012", rank: 12, points: 2400, blade: "Knight Shield", ratchet: "3-80", bit: "Needle", wins: 620, description: "High defense." },
-  { id: "HEL-013", rank: 13, points: 2300, blade: "Hells Chain", ratchet: "5-60", bit: "High Taper", wins: 600, description: "Shock absorb." },
-  { id: "DKE-014", rank: 14, points: 2200, blade: "Dran Dagger", ratchet: "3-60", bit: "Rush", wins: 580, description: "Barrage." },
-  { id: "RHI-015", rank: 15, points: 2100, blade: "Rhino Horn", ratchet: "3-80", bit: "Spike", wins: 550, description: "Compact defense." }
-];
-
-export const MOCK_DB: BeyCombo[] = RAW_MOCK_DB.map(c => ({
-  ...c,
-  ragContent: createRagContent(c)
-} as BeyCombo));
 
 // Synonyms to simulate "Semantic" search for key archetypes
 const KEYWORD_SYNONYMS: Record<string, string[]> = {
@@ -67,6 +82,7 @@ export const parseBeyCSV = (csvText: string): BeyCombo[] => {
       // Mapping logic based on your CSV structure
       if (header.includes('rank')) entry.rank = Number(value) || 999;
       else if (header.includes('points') || header.includes('punti')) entry.points = Number(value) || 0;
+      // Handle "Sample Size (Win Count)" or simply "Wins"
       else if (header.includes('win') || header.includes('sample') || header.includes('vittorie')) entry.wins = Number(value) || 0;
       else if (header.includes('blade')) entry.blade = value;
       else if (header.includes('ratchet')) entry.ratchet = value;
@@ -88,8 +104,12 @@ export const parseBeyCSV = (csvText: string): BeyCombo[] => {
     result.push(entry as BeyCombo);
   }
 
+  // Default sort by Rank ascending (1 is best)
   return result.sort((a, b) => a.rank - b.rank);
 };
+
+// --- INITIALIZE DATABASE FROM EMBEDDED STRING ---
+export const INITIAL_DB: BeyCombo[] = parseBeyCSV(EMBEDDED_CSV_DATA);
 
 /**
  * REPLICATING THE PYTHON "SEARCH_COMBO_SMART" LOGIC
@@ -97,7 +117,7 @@ export const parseBeyCSV = (csvText: string): BeyCombo[] => {
  * 2. Sort by Rank (Ascending)
  * 3. Take Top 30
  */
-export const searchCombos = (query: string, dataset: BeyCombo[] = MOCK_DB): BeyCombo[] => {
+export const searchCombos = (query: string, dataset: BeyCombo[] = INITIAL_DB): BeyCombo[] => {
   const lowerQuery = query.toLowerCase();
   const queryTerms = lowerQuery.split(" ").filter(t => t.length > 2);
 
@@ -127,10 +147,11 @@ export const searchCombos = (query: string, dataset: BeyCombo[] = MOCK_DB): BeyC
   });
 
   // 1. Filter candidates (Simulating "Cosine Similarity > Threshold")
-  // We take broadly anything that matches, or if query is generic ("best"), we take everything.
+  // We take broadly anything that matches.
   let candidates = scored.filter(s => s.score > 0);
   
-  // Fallback for generic queries: if no matches, take everything (to let Rank sort decide)
+  // Fallback for generic queries: if no matches (or user asks "best combos"), 
+  // take everything (to let Rank sort decide)
   if (candidates.length === 0) {
      candidates = scored.map(s => ({ ...s, score: 1 })); 
   }
